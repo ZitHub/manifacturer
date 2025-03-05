@@ -36,7 +36,7 @@ export function ManifacturerTable() {
     fetchTableData();
   }, []);
 
-  const handleCreateNew = () => {
+  const handleCreateManifacturer = () => {
     setSelectedManifacturer({} as Manifacturer);
   };
 
@@ -48,7 +48,7 @@ export function ManifacturerTable() {
     <>
       <div className="flex justify-end m-4">
         <Button
-          onClick={handleCreateNew}
+          onClick={handleCreateManifacturer}
           className="bg-blue-500 hover:bg-blue-600 text-white"
         >
           Add New Manifacturer

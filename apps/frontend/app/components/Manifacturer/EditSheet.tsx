@@ -30,10 +30,6 @@ export function EditSheet({
     setFormData(manifacturerDetails);
   }, [manifacturerDetails]);
 
-  if (!manifacturerDetails) {
-    return null;
-  }
-
   const handleSave = async () => {
     const isNew = !formData?._id;
 
@@ -134,8 +130,6 @@ export function EditSheet({
   };
 
   const handleDeleteShop = (idx: number) => {
-    console.log(idx);
-
     setFormData((prevFormData) => ({
       ...prevFormData!,
       shops: prevFormData!.shops.filter((_, i) => i !== idx),
