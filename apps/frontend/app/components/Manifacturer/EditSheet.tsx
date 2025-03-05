@@ -12,6 +12,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { deleteData, putData, sendData } from "@/app/utils/api";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import { X } from "lucide-react";
 
 export function EditSheet({
   manifacturerDetails,
@@ -85,14 +87,59 @@ export function EditSheet({
   };
 
   const handleDelete = async () => {
-    console.log("Deleting manifacturer", formData?._id);
+    if (!formData?._id) {
+      return;
+    }
 
-    const deletedManifacturer = await deleteData<Manifacturer>(
-      "/manifacturer",
-      formData?._id!
-    );
+    try {
+      const deletedManifacturer = await deleteData<Manifacturer>(
+        "/manifacturer",
+        formData?._id!
+      );
 
-    toast(`Manifacturer ${deletedManifacturer.key} has been deleted.`);
+      toast(`Manifacturer ${deletedManifacturer.key} has been deleted.`, {
+        style: {
+          backgroundColor: "green",
+          color: "white",
+        },
+      });
+    } catch (e: any) {
+      toast(
+        `Failed to delete manifacturer ${formData?._id}. Error: ${e.message}`,
+        {
+          style: {
+            backgroundColor: "red",
+            color: "white",
+          },
+        }
+      );
+    }
+  };
+
+  const handleCheckboxChange = (key: string) => (checked: boolean) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData!,
+      [key]: checked,
+    }));
+  };
+
+  const handleAddShop = () => {
+    setFormData((prevFormData) => ({
+      ...prevFormData!,
+      shops: [
+        ...(prevFormData?.shops || []),
+        { id: "", categoryUrl: "", categoryId: "", name: "", ebayName: "" },
+      ],
+    }));
+  };
+
+  const handleDeleteShop = (idx: number) => {
+    console.log(idx);
+
+    setFormData((prevFormData) => ({
+      ...prevFormData!,
+      shops: prevFormData!.shops.filter((_, i) => i !== idx),
+    }));
   };
 
   const renderAddress = (address: Address) => (
@@ -100,10 +147,10 @@ export function EditSheet({
       {
         <>
           <Label className="mb-4 text-xl">Address</Label>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Street</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Street</Label>
             <Input
-              value={address?.street}
+              value={address?.street ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -112,10 +159,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Postal Code</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Postal Code</Label>
             <Input
-              value={address?.plz}
+              value={address?.plz ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -124,10 +171,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">City</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">City</Label>
             <Input
-              value={address?.city}
+              value={address?.city ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -136,10 +183,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Country</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Country</Label>
             <Input
-              value={address?.country}
+              value={address?.country ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -148,10 +195,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">ISO</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">ISO</Label>
             <Input
-              value={address?.iso}
+              value={address?.iso ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -168,14 +215,24 @@ export function EditSheet({
   const renderShops = (shops: Shop[]) => (
     <>
       <Label className="mb-4 text-xl">Shops</Label>
-      {shops?.length &&
+      {!!shops?.length &&
         shops.map((shop, idx) => (
           <div key={idx} className="mb-4">
-            <h2 className="text-sm font-medium mb-4">Shop-{idx + 1}</h2>
-            <div className="mb-4">
-              <label className="block text-sm font-medium">ID</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <h2 className="text-sm font-medium mb-2">Shop-{idx + 1}</h2>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={(e) => handleDeleteShop(idx)}
+              >
+                <X className="text-red-500" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium">ID</Label>
               <Input
-                value={shop.id}
+                value={shop.id ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData!,
@@ -186,10 +243,10 @@ export function EditSheet({
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium">Category URL</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium">Category URL</Label>
               <Input
-                value={shop.categoryUrl}
+                value={shop.categoryUrl ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData!,
@@ -200,10 +257,10 @@ export function EditSheet({
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium">Category ID</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium">Category ID</Label>
               <Input
-                value={shop.categoryId}
+                value={shop.categoryId ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData!,
@@ -214,40 +271,37 @@ export function EditSheet({
                 }
               />
             </div>
-            {shop.name && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium">Shop Name</label>
-                <Input
-                  value={shop.name}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData!,
-                      shops: formData!.shops.map((s, i) =>
-                        i === idx ? { ...s, name: e.target.value } : s
-                      ),
-                    })
-                  }
-                />
-              </div>
-            )}
-            {shop.ebayName && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium">eBay Name</label>
-                <Input
-                  value={shop.ebayName}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData!,
-                      shops: formData!.shops.map((s, i) =>
-                        i === idx ? { ...s, ebayName: e.target.value } : s
-                      ),
-                    })
-                  }
-                />
-              </div>
-            )}
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium">Shop Name</Label>
+              <Input
+                value={shop.name ?? ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData!,
+                    shops: formData!.shops.map((s, i) =>
+                      i === idx ? { ...s, name: e.target.value } : s
+                    ),
+                  })
+                }
+              />
+            </div>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium">eBay Name</Label>
+              <Input
+                value={shop.ebayName ?? ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData!,
+                    shops: formData!.shops.map((s, i) =>
+                      i === idx ? { ...s, ebayName: e.target.value } : s
+                    ),
+                  })
+                }
+              />
+            </div>
           </div>
         ))}
+      <Button onClick={handleAddShop}>Add Shop</Button>
     </>
   );
 
@@ -256,10 +310,10 @@ export function EditSheet({
       {
         <>
           <Label className="mb-4 text-xl">Contact Details</Label>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Email</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Email</Label>
             <Input
-              value={contact.email}
+              value={contact.email ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -268,10 +322,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Phone Number</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Phone Number</Label>
             <Input
-              value={contact.phone}
+              value={contact.phone ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -280,10 +334,10 @@ export function EditSheet({
               }
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium">Service URL</label>
+          <div className="grid grid-cols-2 items-center gap-4 pb-3">
+            <Label className="block text-sm font-medium">Service URL</Label>
             <Input
-              value={contact.serviceUrl}
+              value={contact.serviceUrl ?? ""}
               onChange={(e) =>
                 setFormData({
                   ...formData!,
@@ -305,8 +359,8 @@ export function EditSheet({
         </SheetHeader>
         <ScrollArea className="p-4 max-h-[800px]">
           <div className="p-1">
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Key</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Key</Label>
               <Input
                 value={formData?.key ?? ""}
                 onChange={(e) =>
@@ -314,28 +368,28 @@ export function EditSheet({
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Name</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Name</Label>
               <Input
-                value={formData?.name}
+                value={formData?.name ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData!, name: e.target.value })
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Company</label>
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Company</Label>
               <Input
-                value={formData?.company}
+                value={formData?.company ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData!, company: e.target.value })
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">
                 Spares URL
-              </label>
+              </Label>
               <Input
                 value={formData?.sparesUrl ?? ""}
                 onChange={(e) =>
@@ -343,37 +397,33 @@ export function EditSheet({
                 }
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Heat</label>
-              <Input
-                value={formData?.heat}
-                onChange={(e) =>
-                  setFormData({ ...formData!, heat: e.target.value })
-                }
+
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Heat</Label>
+              <Checkbox
+                checked={formData?.heat}
+                onCheckedChange={handleCheckboxChange("heat")}
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">Water</label>
-              <Input
-                value={formData?.water}
-                onChange={(e) =>
-                  setFormData({ ...formData!, water: e.target.value })
-                }
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Water</Label>
+              <Checkbox
+                checked={formData?.water}
+                onCheckedChange={handleCheckboxChange("water")}
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">zvshk</label>
-              <Input
-                value={formData?.zvshk}
-                onChange={(e) =>
-                  setFormData({ ...formData!, zvshk: e.target.value })
-                }
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">Zvshk</Label>
+              <Checkbox
+                checked={formData?.zvshk}
+                onCheckedChange={handleCheckboxChange("zvshk")}
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-2">weee</label>
+
+            <div className="grid grid-cols-2 items-center gap-4 pb-3">
+              <Label className="block text-sm font-medium mb-2">weee</Label>
               <Input
-                value={formData?.weee}
+                value={formData?.weee ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData!, weee: e.target.value })
                 }

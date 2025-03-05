@@ -18,7 +18,7 @@ export async function sendData<T>(endpoint: string, body: T): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to post data");
+    throw new Error(`Failed to post data`);
   }
 
   return response.json();

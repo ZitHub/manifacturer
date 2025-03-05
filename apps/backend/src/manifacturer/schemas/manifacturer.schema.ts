@@ -7,7 +7,7 @@ export type ManifacturerDocument = HydratedDocument<Manifacturer>;
 
 @Schema()
 export class Manifacturer {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   key: string;
 
   @Prop({ required: true })
@@ -28,13 +28,13 @@ export class Manifacturer {
   @Prop({ required: false })
   sparesUrl: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
   heat: boolean;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
   water: boolean;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: false })
   zvshk: boolean;
 
   @Prop({ required: true })
